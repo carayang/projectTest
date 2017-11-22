@@ -1,5 +1,3 @@
-package project;
-
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -7,11 +5,17 @@ import java.awt.event.KeyListener;
 import javax.swing.*;
 import javax.swing.border.*;
 
+@SuppressWarnings("serial")
 public class InventoryManagementFrame extends JFrame {
 	private JLabel idLabel;
 	private JTextField idTextField;
 	private JLabel idAlertLabel;
-	private JTextField test;
+	private JLabel webIdLabel;
+	private JTextField webIdTextField;
+	private JLabel webIdAlertLabel;
+	private JLabel priceLabel;
+	private JTextField priceTextField;
+	private JLabel priceAlertLabel;
 
 	public InventoryManagementFrame() {
 		super();
@@ -23,15 +27,22 @@ public class InventoryManagementFrame extends JFrame {
 
 	private void addListeners() {
 		idTextField.addKeyListener(new VIDListener());
+		idTextField.setInputVerifier(new VehicleIDVerifier());
 	}
 
 	private void createCompoments() {
 		idLabel = new JLabel("ID");
 		idTextField = new JTextField(10);
 		idAlertLabel = new JLabel("ID's length should be 10, only number.");
-		idAlertLabel.setForeground(Color.red);
 		idSetTrue();
-		test =  new JTextField(10);
+		priceLabel = new JLabel("Price");
+		priceTextField = new JTextField(10);
+		priceAlertLabel = new JLabel("Price should be integer.");
+		priceSetTrue();
+		webIdLabel = new JLabel("WebID");
+		webIdTextField = new JTextField(20);
+		webIdAlertLabel = new JLabel("Split by \"-\".");
+		webIdSetTrue();
 	}
 
 	private void createPanel() {
@@ -39,7 +50,12 @@ public class InventoryManagementFrame extends JFrame {
 		componetsPanel.add(idLabel);
 		componetsPanel.add(idTextField);
 		componetsPanel.add(idAlertLabel);
-		componetsPanel.add(test);
+		componetsPanel.add(webIdLabel);
+		componetsPanel.add(webIdTextField);
+		componetsPanel.add(webIdAlertLabel);
+		componetsPanel.add(priceLabel);
+		componetsPanel.add(priceTextField);
+		componetsPanel.add(priceAlertLabel);
 		this.add(componetsPanel);
 	}
 
@@ -50,35 +66,52 @@ public class InventoryManagementFrame extends JFrame {
 
 	private void idSetWrong() {
 		idTextField.setBorder(new LineBorder(Color.red));
-		idAlertLabel.setVisible(true);
+		idAlertLabel.setForeground(Color.red);
 	}
 
 	private void idSetTrue() {
 		idTextField.setBorder(new LineBorder(Color.black));
-		idAlertLabel.setVisible(false);
+		idAlertLabel.setForeground(Color.black);
+	}
+	private void webidSetWrong() {
+		webIdTextField.setBorder(new LineBorder(Color.red));
+		webIdAlertLabel.setForeground(Color.red);
 	}
 
-	private class VIDListener implements KeyListener {
-		@Override
-		public void keyPressed(KeyEvent e) {
+	private void webIdSetTrue() {
+		webIdTextField.setBorder(new LineBorder(Color.black));
+		webIdAlertLabel.setForeground(Color.black);
+	}
+
+	private void priceSetTrue() {
+		priceTextField.setBorder(new LineBorder(Color.black));
+		priceAlertLabel.setForeground(Color.black);
+	}
+
+	private void priceSetFalse() {
+		priceTextField.setBorder(new LineBorder(Color.red));
+		priceAlertLabel.setForeground(Color.red);
+	}
+
+	public class VehicleIDVerifier extends InputVerifier {
+
+		public boolean verify(JComponent input) {
+			String vid = ((JTextField) input).getText();
+			if (vid.length() == 10) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 
-		@Override
-		public void keyReleased(KeyEvent e) {
-		}
-
-		@Override
-		public void keyTyped(KeyEvent e) {
-			int keyInput = e.getKeyChar();
-			if (keyInput < KeyEvent.VK_0 || keyInput > KeyEvent.VK_9) {
+		public boolean shouldYieldFocus(JComponent input) {
+			boolean valid = verify(input);
+			if (!valid) {
 				idSetWrong();
-				e.consume();// invalid input will be eliminated
+			} else {
+				idSetTrue();
 			}
-			String str = idTextField.getText();// button from UI
-			if (str.length() > 9) {
-				idSetWrong();
-				e.consume();// invalid input will be eliminated
-			}
+			return valid;
 		}
 	}
 }
