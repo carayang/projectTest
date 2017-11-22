@@ -1,5 +1,3 @@
-package project;
-
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -7,11 +5,14 @@ import java.awt.event.KeyListener;
 import javax.swing.*;
 import javax.swing.border.*;
 
+@SuppressWarnings("serial")
 public class InventoryManagementFrame extends JFrame {
 	private JLabel idLabel;
 	private JTextField idTextField;
 	private JLabel idAlertLabel;
-	private JTextField test;
+	private JLabel priceLabel;
+	private JTextField priceTextField;
+	private JLabel priceAlertLabel;
 
 	public InventoryManagementFrame() {
 		super();
@@ -23,6 +24,7 @@ public class InventoryManagementFrame extends JFrame {
 
 	private void addListeners() {
 		idTextField.addKeyListener(new VIDListener());
+		idTextField.setInputVerifier(new VehicleIDVerifier());
 	}
 
 	private void createCompoments() {
@@ -31,7 +33,10 @@ public class InventoryManagementFrame extends JFrame {
 		idAlertLabel = new JLabel("ID's length should be 10, only number.");
 		idAlertLabel.setForeground(Color.red);
 		idSetTrue();
-		test =  new JTextField(10);
+		priceLabel = new JLabel("Price");
+		priceTextField = new JTextField(10);
+		priceAlertLabel = new JLabel("Price should be integer.");
+		priceSetTrue();
 	}
 
 	private void createPanel() {
@@ -39,7 +44,9 @@ public class InventoryManagementFrame extends JFrame {
 		componetsPanel.add(idLabel);
 		componetsPanel.add(idTextField);
 		componetsPanel.add(idAlertLabel);
-		componetsPanel.add(test);
+		componetsPanel.add(priceLabel);
+		componetsPanel.add(priceTextField);
+		componetsPanel.add(priceAlertLabel);
 		this.add(componetsPanel);
 	}
 
@@ -50,12 +57,22 @@ public class InventoryManagementFrame extends JFrame {
 
 	private void idSetWrong() {
 		idTextField.setBorder(new LineBorder(Color.red));
-		idAlertLabel.setVisible(true);
+		idAlertLabel.setForeground(Color.red);
 	}
 
 	private void idSetTrue() {
 		idTextField.setBorder(new LineBorder(Color.black));
-		idAlertLabel.setVisible(false);
+		idAlertLabel.setForeground(Color.black);
+	}
+
+	private void priceSetTrue() {
+		priceTextField.setBorder(new LineBorder(Color.black));
+		priceAlertLabel.setForeground(Color.black);
+	}
+
+	private void priceSetFalse() {
+		priceTextField.setBorder(new LineBorder(Color.red));
+		priceAlertLabel.setForeground(Color.red);
 	}
 
 	private class VIDListener implements KeyListener {
@@ -70,15 +87,53 @@ public class InventoryManagementFrame extends JFrame {
 		@Override
 		public void keyTyped(KeyEvent e) {
 			int keyInput = e.getKeyChar();
-			if (keyInput < KeyEvent.VK_0 || keyInput > KeyEvent.VK_9) {
+			if (keyInput != KeyEvent.VK_ENTER && keyInput != KeyEvent.VK_BACK_SPACE
+					&& (keyInput < KeyEvent.VK_0 || keyInput > KeyEvent.VK_9)) {
 				idSetWrong();
-				e.consume();// invalid input will be eliminated
+				e.consume();// invalid numeric input will be eliminated
 			}
-			String str = idTextField.getText();// button from UI
-			if (str.length() > 9) {
+			String str = idTextField.getText();
+			if (keyInput == KeyEvent.VK_ENTER) {
+				if (str.length() != 10)
+					idSetWrong();
+				else
+					idSetTrue();
+			}
+			if (keyInput == KeyEvent.VK_BACK_SPACE) {
+				if (str.length() < 10) {
+					idSetTrue();
+				}
+			}
+			if (keyInput != KeyEvent.VK_ENTER && keyInput != KeyEvent.VK_BACK_SPACE) {
+				if (str.length() == 9)
+					idSetTrue();
+				if (str.length() > 9) {
+					idSetWrong();
+					e.consume();
+				}
+			}
+		}
+	}
+
+	public class VehicleIDVerifier extends InputVerifier {
+
+		public boolean verify(JComponent input) {
+			String vid = ((JTextField) input).getText();
+			if (vid.length() == 10) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		public boolean shouldYieldFocus(JComponent input) {
+			boolean valid = verify(input);
+			if (!valid) {
 				idSetWrong();
-				e.consume();// invalid input will be eliminated
+			} else {
+				idSetTrue();
 			}
+			return valid;
 		}
 	}
 }
