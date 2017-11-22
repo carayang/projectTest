@@ -80,7 +80,7 @@ public class InventoryManagementFrame extends JFrame {
 	    }
 	}
 
-	public class VehicleIDVerifier extends InputVerifier {
+	private class VehicleIDVerifier extends InputVerifier {
 
 		public boolean verify(JComponent input){
 			String vid = ((JTextField)input).getText();
