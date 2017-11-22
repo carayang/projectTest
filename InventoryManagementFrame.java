@@ -11,7 +11,7 @@ public class InventoryManagementFrame extends JFrame {
 	private JLabel idLabel;
 	private JTextField idTextField;
 	private JLabel idAlertLabel;
-	private JTextField jf1;//for testing
+	private JTextField jf1;//for testing need
 
 	public InventoryManagementFrame() {
 		super();
@@ -66,21 +66,35 @@ public class InventoryManagementFrame extends JFrame {
 	    @Override
 	    public void keyTyped(KeyEvent e){
 	        int keyInput = e.getKeyChar();
-	        if(keyInput < KeyEvent.VK_0 || keyInput > KeyEvent.VK_9){
+	        if(keyInput != KeyEvent.VK_ENTER && keyInput != KeyEvent.VK_BACK_SPACE
+					&& (keyInput < KeyEvent.VK_0 || keyInput > KeyEvent.VK_9)){
 	            idSetWrong();
 	            e.consume();//invalid numeric input will be eliminated
 	        }
-	        String str = idTextField.getText();
-	        if(str.length() == 9)
-	        	idSetTrue();
-	        if(str.length() > 9){
-	        	idSetWrong();
-	        	e.consume();
+			String str = idTextField.getText();
+	        if(keyInput == KeyEvent.VK_ENTER){
+	        	if(str.length() != 10)
+	        		idSetWrong();
+	        	else
+	        		idSetTrue();
+			}
+			if(keyInput == KeyEvent.VK_BACK_SPACE){
+	        	if(str.length() < 10){
+	        		idSetTrue();
+				}
+			}
+			if(keyInput != KeyEvent.VK_ENTER && keyInput != KeyEvent.VK_BACK_SPACE){
+				if(str.length() == 9)
+					idSetTrue();
+				if(str.length() > 9){
+					idSetWrong();
+					e.consume();
+				}
 			}
 	    }
 	}
 
-	private class VehicleIDVerifier extends InputVerifier {
+	public class VehicleIDVerifier extends InputVerifier {
 
 		public boolean verify(JComponent input){
 			String vid = ((JTextField)input).getText();
@@ -100,5 +114,8 @@ public class InventoryManagementFrame extends JFrame {
 			}
 			return valid;
 		}
+
 	}
+
 }
+
